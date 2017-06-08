@@ -1,3 +1,5 @@
+![Hugo with Nanobox](https://guides.nanobox.io/assets/quickstart-icons/hugo.png)
+
 # Hugo from scratch
 
 Run a Hugo app locally, install nothing besides nanobox.
