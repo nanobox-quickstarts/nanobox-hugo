@@ -1,0 +1,34 @@
+# forked from https://gist.github.com/tylerflint/c6316e7755f5a5e330c3ffe709102161
+# updated to work with the latest releases of hugo
+# obtaining latest release via bash from:
+# https://blog.markvincze.com/download-artifacts-from-a-latest-github-release-in-sh-and-powershell/
+# with additional tweaks to work with Hugo's download file naming
+run.config:
+  engine: static
+  
+  cache_dirs:
+    - .bin
+    
+  extra_path_dirs:
+    - /app/.bin
+  
+  extra_steps:
+    # fetch hugo binary if it doesn't exist
+    - |
+      if [[ ! -f .bin/hugo ]]; then
+        cd /tmp
+        LATEST_RELEASE=$(curl -L -s -H 'Accept: application/json' https://github.com/spf13/hugo/releases/latest)
+        LATEST_VERSION=$(echo $LATEST_RELEASE | sed -e 's/.*"tag_name":"\([^"]*\)".*/\1/')
+        LATEST_VERSION_NUM_ONLY=${LATEST_VERSION:1}
+        HUGO_TAR_NAME="hugo_${LATEST_VERSION_NUM_ONLY}_Linux-64bit.tar.gz"
+        ARTIFACT_URL="https://github.com/spf13/hugo/releases/download/${LATEST_VERSION}/${HUGO_TAR_NAME}"  
+        wget $ARTIFACT_URL
+        tar -xzf $HUGO_TAR_NAME
+        mv /tmp/hugo /app/.bin/hugo
+        rm LICENSE.md README.md $HUGO_TAR_NAME
+        cd - >/dev/null
+      fi
+deploy.config:
+  extra_steps:
+    # generate the site
+    - hugo
